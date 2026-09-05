@@ -207,7 +207,6 @@ function renderQuestion() {
         : '예: 알레프';
 
   updateStats();
-  focusAnswerInput();
 }
 
 function updateStats() {
