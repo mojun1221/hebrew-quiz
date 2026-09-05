@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- 아이폰 확대/화면 크기 대응 -->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>성서 히브리어 퀴즈</title>
+
+  <!-- 기존 CSS 그대로 사용 -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 모바일 전용 추가 설정 -->
+  <style>
+
+    /* =========================
+       iPhone / 모바일 최적화
+       ========================= */
+
+    @media (max-width: 700px) {
+
+      html {
+        width: 100%;
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+
+        width: 100%;
+        min-height: 100dvh;
+
+        overflow-x: hidden;
+
+        /* 아이폰 노치/홈바 대응 */
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+
+        box-sizing: border-box;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+
+      /* 전체 사이트 */
+
+      .app-shell {
+        width: 100%;
+        min-height: 100dvh;
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+
+
+      /* =========================
+         상단 제목
+         ========================= */
+
+      .topbar {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+
+      .topbar h1 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .topbar p {
+        margin: 4px 0 0;
+        font-size: 11px;
+        line-height: 1.4;
+      }
+
+      #resetBtn {
+        font-size: 11px;
+        padding: 7px 9px;
+        white-space: nowrap;
+      }
+
+
+      /* =========================
+         문제 / 오답노트 메뉴
+         ========================= */
+
+      .tabs {
+        margin-top: 5px;
+        gap: 4px;
+      }
+
+      .tab {
+        font-size: 11px;
+        padding: 8px 4px;
+        white-space: nowrap;
+      }
+
+
+      /* =========================
+         자음 / 모음 / 자음+모음
+         ========================= */
+
+      .mode-picker {
+        margin: 8px 0;
+        gap: 5px;
+      }
+
+      .mode-btn {
+        padding: 8px 8px;
+        font-size: 12px;
+      }
+
+
+      /* =========================
+         통계
+         ========================= */
+
+      .stats-grid {
+        gap: 5px;
+        margin-bottom: 7px;
+      }
+
+      .stat-card {
+        padding: 6px 3px;
+      }
+
+      .stat-card span {
+        font-size: 10px;
+      }
+
+      .stat-card strong {
+        font-size: 14px;
+      }
+
+
+      /* =========================
+         문제 카드
+         ========================= */
+
+      .quiz-card {
+        margin-top: 6px;
+        padding: 12px;
+      }
+
+      .question-head {
+        font-size: 11px;
+      }
+
+      .pill {
+        font-size: 10px;
+        padding: 4px 7px;
+      }
+
+
+      /* =========================
+         히브리어 문제
+         ========================= */
+
+      .hebrew-wrap {
+        padding: 5px 0 8px;
+      }
+
+      .hebrew-glyph {
+        /*
+          너무 크게 만들면 키보드 등장 시
+          문제 영역이 화면 밖으로 밀리므로 제한
+        */
+        font-size: clamp(54px, 18vw, 82px);
+        line-height: 1.05;
+        margin: 0;
+      }
+
+      .question-hint {
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+
+      /* =========================
+         정답 입력
+         ========================= */
+
+      #answerForm {
+        margin-top: 5px;
+      }
+
+      #answerForm label {
+        font-size: 11px;
+      }
+
+      .answer-row {
+        display: flex;
+        gap: 5px;
+      }
+
+      #answerInput {
+        flex: 1;
+        min-width: 0;
+
+        /*
+          중요:
+          iPhone Safari는 16px 미만 input을
+          누르면 화면을 자동 확대할 수 있음.
+        */
+        font-size: 16px !important;
+
+        padding: 10px 11px;
+      }
+
+
+      /* =========================
+         모바일에서는 버튼을 안 써도 됨
+         
+         Enter 1번 = 제출
+         Enter 2번 = 다음 문제
+         ========================= */
+
+      #submitBtn {
+        display: none;
+      }
+
+      #nextBtn {
+        display: inline-flex;
+      }
+
+      #nextBtn.hidden {
+        display: none !important;
+      }
+
+
+      /* 건너뛰기는 필요하므로 유지 */
+
+      #skipBtn,
+      #nextBtn {
+        font-size: 11px;
+        padding: 6px 10px;
+      }
+
+
+      /* =========================
+         채점 결과
+         ========================= */
+
+      .feedback {
+        min-height: 22px;
+        margin-top: 5px;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .actions {
+        margin-top: 4px;
+      }
+
+    }
+
+
+    /* =========================
+       키보드가 떠 있을 때 사용할 클래스
+       ========================= */
+
+    body.keyboard-open .topbar p {
+      display: none;
+    }
+
+    body.keyboard-open .topbar {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    body.keyboard-open .tabs {
+      margin-top: 2px;
+    }
+
+    body.keyboard-open .mode-picker {
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    body.keyboard-open .stats-grid {
+      margin-bottom: 4px;
+    }
+
+    body.keyboard-open .quiz-card {
+      margin-top: 3px;
+      padding-top: 8px;
+    }
+
+    body.keyboard-open .hebrew-wrap {
+      padding-top: 2px;
+      padding-bottom: 4px;
+    }
+
+    body.keyboard-open .hebrew-glyph {
+      font-size: clamp(48px, 15vw, 68px);
+    }
+
+
+    /* 모바일 키보드가 떠도 문서 전체가 밀리지 않도록 고정 */
+    @media (max-width: 700px) {
+      html,
+      body {
+        height: 100%;
+        overscroll-behavior: none;
+      }
+
+      body {
+        overflow: hidden;
+      }
+
+      .app-shell {
+        min-height: 100dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      body.keyboard-open main {
+        padding-top: 0;
+      }
+
+      body.keyboard-open .topbar {
+        position: relative;
+      }
+
+      body.keyboard-open #answerInput {
+        scroll-margin-top: 0;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div>
+        <h1>성서 히브리어 퀴즈</h1>
+
+        <p>
+          “내 눈을 열어서 주의 율법에서 놀라운 것을 보게 하소서”
+          시 119:18
+        </p>
+      </div>
+
+      <button id="resetBtn" class="ghost danger">
+        기록 초기화
+      </button>
+    </header>
+
+
+    <nav class="tabs" aria-label="퀴즈 메뉴">
+
+      <button
+        class="tab active"
+        data-view="quiz">
+        문제 풀이
+      </button>
+
+      <button
+        class="tab"
+        data-view="wrong">
+        오답노트
+        <span id="wrongCountBadge">0</span>
+      </button>
+
+      <button
+        class="tab"
+        data-view="wrongQuiz">
+        오답만 다시 풀기
+      </button>
+
+    </nav>
+
+
+    <main>
+
+      <!-- =========================
+           문제 풀이
+           ========================= -->
+
+      <section
+        id="quizView"
+        class="view active">
+
+        <div
+          class="mode-picker"
+          aria-label="문제 유형">
+
+          <button
+            class="mode-btn active"
+            data-mode="consonant">
+            자음
+          </button>
+
+          <button
+            class="mode-btn"
+            data-mode="vowel">
+            모음
+          </button>
+
+          <button
+            class="mode-btn"
+            data-mode="combined">
+            자음 + 모음
+          </button>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <span>진행</span>
+            <strong id="progressText">0 / 0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>정답률</span>
+            <strong id="accuracyText">0%</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>정답</span>
+            <strong id="correctText">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>오답</span>
+            <strong id="wrongText">0</strong>
+          </div>
+
+        </div>
+
+
+        <section class="quiz-card">
+
+          <div class="question-head">
+
+            <span
+              id="modeLabel"
+              class="pill">
+              자음
+            </span>
+
+            <span id="questionNo">
+              문제 0 / 0
+            </span>
+
+          </div>
+
+
+          <div class="hebrew-wrap">
+
+            <div
+              id="hebrewGlyph"
+              class="hebrew-glyph"
+              dir="rtl">
+              א
+            </div>
+
+            <div
+              id="questionHint"
+              class="question-hint">
+              이 자음의 이름을 입력하세요.
+            </div>
+
+          </div>
+
+
+          <form
+            id="answerForm"
+            autocomplete="off">
+
+            <label for="answerInput">
+              정답
+            </label>
+
+            <div class="answer-row">
+
+              <input
+                id="answerInput"
+                type="text"
+                placeholder="예: 알레프"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+                enterkeyhint="done"
+              />
+
+              <!-- PC에서는 표시됨 -->
+              <button
+                id="submitBtn"
+                type="submit"
+                class="primary">
+                제출
+              </button>
+
+            </div>
+
+          </form>
+
+
+          <div
+            id="feedback"
+            class="feedback"
+            aria-live="polite">
+          </div>
+
+
+          <div class="actions">
+
+            <button
+              id="skipBtn"
+              class="ghost">
+              건너뛰기
+            </button>
+
+            <!-- PC에서는 표시됨 -->
+            <button
+              id="nextBtn"
+              class="primary hidden">
+              다음 문제
+            </button>
+
+          </div>
+
+        </section>
+
+      </section>
+
+
+
+      <!-- =========================
+           오답노트
+           ========================= -->
+
+      <section
+        id="wrongView"
+        class="view">
+
+        <div class="section-title">
+
+          <div>
+
+            <h2>
+              오답노트
+            </h2>
+
+            <p>
+              틀린 글자와 내가 쓴 답,
+              정답을 확인할 수 있습니다.
+            </p>
+
+          </div>
+
+          <button
+            id="clearWrongBtn"
+            class="ghost danger">
+            오답노트 비우기
+          </button>
+
+        </div>
+
+        <div id="wrongList" class="wrong-list">
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================
+           오답 다시 풀기
+           ========================= -->
+
+      <section
+        id="wrongQuizView"
+        class="view">
+
+        <div class="empty-panel">
+
+          <h2>
+            오답만 다시 풀기
+          </h2>
+
+          <p id="wrongQuizGuide">
+            오답이 생기면 여기서 다시 풀 수 있습니다.
+          </p>
+
+          <button
+            id="startWrongQuizBtn"
+            class="primary">
+            오답 복습 시작
+          </button>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- 문제 데이터 -->
+  <script src="questions.js"></script>
+
+  <!-- 기존 퀴즈 기능 -->
+  <script src="app.js"></script>
+
+  <!-- =========================
+       아이폰 키보드 대응
+       ========================= -->
+  <script>
+    (() => {
+      const body = document.body;
+
+      function updateKeyboardState() {
+        if (!window.visualViewport) return;
+
+        const vv = window.visualViewport;
+        const keyboardOpen =
+          window.innerHeight - vv.height > 140 ||
+          vv.height < window.innerHeight * 0.82;
+
+        body.classList.toggle('keyboard-open', keyboardOpen);
+      }
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', updateKeyboardState);
+      }
+
+      window.addEventListener('orientationchange', () => {
+        setTimeout(updateKeyboardState, 100);
+      });
+
+      updateKeyboardState();
+    })();
+  </script>
+
+</body>
+</html>
