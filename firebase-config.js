@@ -13,4 +13,5 @@ export const firebaseConfig = {
   storageBucket: "hevrew-b107c.firebasestorage.app",
   messagingSenderId: "28836791171",
   appId: "1:28836791171:web:21e5881cde7504dcc9acb6"
+  measurementId: "G-P29RJ38DSF"
 };
