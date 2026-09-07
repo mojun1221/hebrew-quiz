@@ -7,10 +7,10 @@
 // 절대로 이 파일에 넣지 마세요.
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyAxoARs21lT6wgaY2eS7hNIppeNHz1kEKQ",
-  authDomain: "hevrew-b107c.firebaseapp.com",
-  projectId: "hevrew-b107c",
-  storageBucket: "hevrew-b107c.firebasestorage.app",
-  messagingSenderId: "28836791171",
-  appId: "1:28836791171:web:21e5881cde7504dcc9acb6"
+  apiKey: "AIzaSyDY2dRN5Od18_JSPAorOB0hqVYYHVar4FA",
+  authDomain: "hebrew-kbtus.firebaseapp.com",
+  projectId: "hebrew-kbtus",
+  storageBucket: "hebrew-kbtus.firebasestorage.app",
+  messagingSenderId: "281052744998",
+  appId: "1:281052744998:web:043d9dba6bc69863b205e7"
 };
