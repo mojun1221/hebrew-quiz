@@ -650,14 +650,6 @@ function startRank() {
   showRankPanel(els.rankPlayPanel);
 
   renderRankQuestion();
-
-// 랭크 시작 버튼을 누르는 즉시 정답 입력칸 활성화
-  try {
-    els.rankAnswerInput.focus({ preventScroll: true });
-  } catch {
-    els.rankAnswerInput.focus();
-  }
-
   updateRankTimer();
 
   clearInterval(rankState.timerId);
@@ -680,6 +672,13 @@ function renderRankQuestion() {
   els.rankGlyph.textContent = q.glyph;
   els.rankAnswerInput.value = '';
   els.rankAnswerInput.disabled = false;
+
+  // 문제 표시와 동시에 입력창 포커스
+  try {
+    els.rankAnswerInput.focus({ preventScroll: true });
+  } catch {
+    els.rankAnswerInput.focus();
+  }
 }
 
 function submitRankAnswer() {
