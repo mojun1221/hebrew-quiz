@@ -276,8 +276,6 @@ function submitAnswer() {
 
   const MASTER_CODE = '01048463622';
 
-  const MASTER_CODE = '01048463622';
-
   const ok =
     raw.trim() !== '' &&
     (
