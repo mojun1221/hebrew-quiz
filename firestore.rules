@@ -1,0 +1,85 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owner(uid) {
+      return signedIn()
+        && request.auth.uid == uid;
+    }
+
+    function validNickname(value) {
+      return value is string
+        && value.size() >= 2
+        && value.size() <= 12;
+    }
+
+    function validRankRecord(data) {
+      return data.bestScore is int
+        && data.bestScore >= 0
+        && data.bestScore <= 22125
+
+        && data.bestCorrect is int
+        && data.bestCorrect >= 0
+        && data.bestCorrect <= 25
+
+        && data.bestTimeMs is int
+        && data.bestTimeMs >= 0
+        && data.bestTimeMs <= 85000
+
+        && data.rankSortKey is int
+        && data.rankSortKey >= 0;
+    }
+
+    match /rankPlayers/{uid} {
+
+      // 랭킹 표시는 누구나 읽을 수 있음
+      allow read: if true;
+
+      // 최초 프로필 생성
+      allow create: if owner(uid)
+        && request.resource.data.uid == uid
+        && validNickname(
+          request.resource.data.nickname
+        )
+        && request.resource.data.bestScore == 0
+        && request.resource.data.bestCorrect == 0
+        && request.resource.data.bestTimeMs == 0
+        && request.resource.data.rankSortKey == 0;
+
+      // 본인 기록만 업데이트 가능.
+      // uid / nickname 변경 금지.
+      allow update: if owner(uid)
+        && request.resource.data.uid
+          == resource.data.uid
+        && request.resource.data.nickname
+          == resource.data.nickname
+        && validRankRecord(
+          request.resource.data
+        )
+        && request.resource.data.rankSortKey
+          >= resource.data.rankSortKey;
+
+      allow delete: if false;
+    }
+
+    match /rankNicknames/{nicknameKey} {
+
+      // 닉네임 중복 확인
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.uid
+          == request.auth.uid
+        && validNickname(
+          request.resource.data.nickname
+        );
+
+      allow update, delete: if false;
+    }
+  }
+}
